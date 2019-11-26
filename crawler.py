@@ -11,7 +11,8 @@ import csv
 import requests
 
 test_url = "https://forums.whirlpool.net.au/thread/9jwq5mn3"
-url = test_url
+url = input("Enter Whirlpool Thread Link: \n")
+#url = test_url
 
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 r  = requests.get(url, headers=headers)
@@ -28,27 +29,14 @@ print("Scraping Page: ", title)
 with open(title + '.csv', mode='w', newline='') as file:
     writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     writer.writerow(['User Post', 'Quoted Comment', 'Reply'])
-        
-    test_url = "https://forums.whirlpool.net.au/thread/9jwq5mn3"
-    url = test_url
-    
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-    r  = requests.get(url, headers=headers)
-    
-    url_data = r.text
-    
-    soup = BeautifulSoup(url_data, "lxml")
-    
-    #first grab title
-    title = soup.title.text
-    print(title)
     
     #GRAB ALL REPLIES
     for reply in soup.findAll("div", {"class": "replyblock"}):
         #start with username
         user = reply.find('div', attrs={'class': 'replyuser'})
-        username = user.find('div', attrs={'class': 'username'}).text.strip()
-        print(username)
+        username = user.find('div', attrs={'class': 'username'})
+        if (username != None): username = username.text.strip()
+        #print(username)
         reply_text = reply.find('div', attrs={'class': 'replytext'})
         
         all_questions = ''
@@ -65,13 +53,14 @@ with open(title + '.csv', mode='w', newline='') as file:
             response = answer.find('span', attrs={'class': 'wcrep1'})
     
             if (response == None): 
-                print(answer)
+                #print(answer)
                 all_answers += answer.text + " ** "   
             #all_questions += question.text + ' ** '
             
         #for text in reply_text:
-        print("Q: ", all_questions, "A: ", all_answers)
+        #print("Q: ", all_questions, "A: ", all_answers)
         
         writer.writerow([username, all_questions, all_answers])
+    print("Done, Data saved to ", title)
        # print(all_questions)
         
